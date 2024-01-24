@@ -82,7 +82,8 @@ if __name__ == "__main__":
                     status = LoRa.status()
                     if status == LoRa.STATUS_CRC_ERR : print("CRC error")
                     elif status == LoRa.STATUS_HEADER_ERR : print("Packet header error")
-                    time.sleep(4)
+                    time.sleep(4)           
+            
             
 
         
