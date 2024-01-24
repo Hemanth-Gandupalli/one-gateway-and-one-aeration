@@ -37,33 +37,37 @@ def post_data_to_publish():
         with open('status.txt','r') as f:
             status = f.read()
         if status == "True":
-            with open ("data.json",'r') as f:
-                data = json.load(f)
-            sensor1 = data["sensor1"]
-            sensor2 = data["sensor2"]
-            sensor3 = data["sensor3"]
-            sensor4 = data["sensor4"]
-            x = data["x"]
-            y = data["y"]
-            z = data["z"] 
+            try:
+                with open ("data.json",'r') as f:
+                    data = json.load(f)
+                sensor1 = data["sensor1"]
+                sensor2 = data["sensor2"]
+                sensor3 = data["sensor3"]
+                sensor4 = data["sensor4"]
+                X = data["x"]
+                Y = data["y"]
+                Z = data["z"]
+            except Exception as e:
+                print(e)
         if status == "False":
                 sensor1 = 0
                 sensor2 = 0
                 sensor3 = 0
                 sensor4 = 0
-                x = 0
-                y = 0
-                z = 0
+                X = 0
+                Y = 0
+                Z = 0
             
         for i in mq.topic:
             
             mq.data_publish({"dataPoint": now, "paramType": 'Sensor1', "paramValue": sensor1, "deviceId": i})
             mq.data_publish({"dataPoint": now, "paramType": 'Sensor2', "paramValue": sensor2, "deviceId": i})
-            # mq.data_publish({"dataPoint": now, "paramType": 'Sensor2', "paramValue": sensor3, "deviceId": i})
-            # mq.data_publish({"dataPoint": now, "paramType": 'Sensor2', "paramValue": sensor4, "deviceId": i})
-            # mq.data_publish({"dataPoint": now, "paramType": 'Sensor2', "paramValue": x, "deviceId": i})
-            # mq.data_publish({"dataPoint": now, "paramType": 'Sensor2', "paramValue": y, "deviceId": i})
-            # mq.data_publish({"dataPoint": now, "paramType": 'Sensor2', "paramValue": z, "deviceId": i})
+            mq.data_publish({"dataPoint": now, "paramType": 'Sensor3', "paramValue": sensor3, "deviceId": i})
+            mq.data_publish({"dataPoint": now, "paramType": 'Sensor4', "paramValue": sensor4, "deviceId": i})
+            mq.data_publish({"dataPoint": now, "paramType": 'X', "paramValue": X, "deviceId": i})
+            mq.data_publish({"dataPoint": now, "paramType": 'Y', "paramValue": Y, "deviceId": i})
+            mq.data_publish({"dataPoint": now, "paramType": 'Z', "paramValue": Z, "deviceId": i})
+            
         time.sleep(5)
         
 def data_subscribe():
@@ -110,8 +114,7 @@ def compressor():
         print("Compressor is OFF")
         time.sleep(1800)
 def mail():
-    global delay_mail
-    time.sleep(delay_mail)
+    time.sleep(10)
     while True:
         try:
             with open("status.txt",'r') as f:
@@ -162,7 +165,6 @@ def mail():
             
         except Exception as e:
             print(e)
-
 
 if __name__ == '__main__':
     status = None
