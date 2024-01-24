@@ -43,7 +43,7 @@ if __name__ == "__main__":
                     print("-------------Gateway shifts to reciving mode---------------")
                     LoRa.setRxGain(LoRa.RX_GAIN_POWER_SAVING, LoRa.RX_GAIN_AUTO)
                     LoRa.request()
-                    LoRa.wait(1)
+                    LoRa.wait()
                     try:
                         rcv_data=[]
                         while LoRa.available():
@@ -59,7 +59,7 @@ if __name__ == "__main__":
                         x = unstruct_data[4]
                         y = unstruct_data[5]
                         z = unstruct_data[6]
-                        with open("data.json",'r') as f:
+                        with open("/home/pi/data.json",'r') as f:
                             data = json.load(f)
                         data["sensor1"] = sensor1
                         data["sensor2"] = sensor2
@@ -68,9 +68,9 @@ if __name__ == "__main__":
                         data["x"] = x
                         data["y"] = y
                         data["z"] = z
-                        with open("data.json",'w') as f:
+                        with open("/home/pi/data.json",'w') as f:
                             json.dump(data,f)
-                        with open ('status.txt','r') as file:
+                        with open ('/home/pi/status.txt','r') as file:
                             s = file.read()
                         if s == "True":
                             print("Recieved data--->",unstruct_data)
@@ -82,7 +82,7 @@ if __name__ == "__main__":
                     status = LoRa.status()
                     if status == LoRa.STATUS_CRC_ERR : print("CRC error")
                     elif status == LoRa.STATUS_HEADER_ERR : print("Packet header error")
-                    time.sleep(4)           
+                    time.sleep(1)           
             
             
 
