@@ -12,9 +12,9 @@ import RPi.GPIO as GPIO
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(6, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(23, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(5, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(6, GPIO.OUT, initial=GPIO.HIGH)
+GPIO.setup(23, GPIO.OUT, initial=GPIO.HIGH)
+GPIO.setup(5, GPIO.OUT, initial=GPIO.HIGH)
 
 delay_main = 2
 delay_internet_off = 3600
@@ -34,11 +34,11 @@ def post_data_to_publish():
     mq.connect_to_broker()
     while True:
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        with open('status.txt','r') as f:
+        with open('/home/pi/status.txt','r') as f:
             status = f.read()
         if status == "True":
             try:
-                with open ("data.json",'r') as f:
+                with open ("/home/pi/data.json",'r') as f:
                     data = json.load(f)
                 sensor1 = data["sensor1"]
                 sensor2 = data["sensor2"]
@@ -86,7 +86,7 @@ def data_subscribe():
         
 def main():
     while True:
-        with open("status.txt",'r') as f:
+        with open("/home/pi/status.txt",'r') as f:
             status = f.read()
         if status == "True":
             GPIO.output(6, GPIO.HIGH)
@@ -117,7 +117,7 @@ def mail():
     time.sleep(10)
     while True:
         try:
-            with open("status.txt",'r') as f:
+            with open("/home/pi/status.txt",'r') as f:
                 status = f.read()
             s = status
             print(s)
@@ -144,7 +144,7 @@ def mail():
                 z = round(data["z"],2)
                 print("t")
                 #body = f"GW_Status:ON  Aeration:On  CompCurrVal:{current1} Amp  AerationCurrVal:{current2} Amp"
-                body = f"GW_Status:ON  Aeration:On  sensor1 :{sensor1} Amp\nsensor2 :{sensor2} Amp\nsensor3 :{sensor3} Amp\nsensor4 :{sensor4} Amp\nX :{x} Amp\nY :{y} Amp\nZ :{z} Amp"
+                body = f"GW_Status:ON  Aeration:On\n  sensor1 :{sensor1} Amp\nsensor2 :{sensor2} Amp\nsensor3 :{sensor3} Amp\nsensor4 :{sensor4} Amp\nX :{x} Amp\nY :{y} Amp\nZ :{z} Amp"
             else:
                 print("f")
                 body = "GW_status:ON Aeration Device :OFF"
@@ -168,6 +168,7 @@ def mail():
 
 if __name__ == '__main__':
     status = None
+    time.sleep(15)
     threading.Thread(target=post_data_to_publish).start()
     threading.Thread(target=data_subscribe).start()
     threading.Thread(target=main).start()
