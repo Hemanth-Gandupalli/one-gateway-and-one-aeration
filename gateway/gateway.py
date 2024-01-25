@@ -3,47 +3,42 @@ from datetime import datetime,timedelta
 import json
 import os, sys
 import struct
-currentdir = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
-from LoRaRF import SX127x
-import time
-from gpiozero import CPUTemperature
-busId = 0; csId = 0
-resetPin = 22; irqPin = -1; txenPin = -1; rxenPin = -1
-LoRa = SX127x()
-print("Begin LoRa radio")
-if not LoRa.begin(busId, csId, resetPin, irqPin, txenPin, rxenPin) :
-    raise Exception("Something wrong, can't begin LoRa radio")
-
-print("Set frequency to 433 Mhz")
-LoRa.setFrequency(433000000)
-
-
-print("Set modulation parameters:\n\tSpreading factor = 7\n\tBandwidth = 125 kHz\n\tCoding rate = 4/5")
-LoRa.setSpreadingFactor(7)
-LoRa.setBandwidth(125000)
-LoRa.setCodeRate(4/5)
-
-print("Set packet parameters:\n\tExplicit header type\n\tPreamble length = 12\n\tPayload Length = 15\n\tCRC on")
-LoRa.setHeaderType(LoRa.HEADER_EXPLICIT)
-LoRa.setPreambleLength(12)
-LoRa.setPayloadLength(15)
-LoRa.setCrcEnable(True)
-
-print("Set syncronize word to 0x34")
-LoRa.setSyncWord(0x34)
-print("\n-- LoRa Gateway --\n")
-recv_slot=[[1,10],[11,21],[22,32],[33,43],[44,54],[55,59]]
-sleep = [[10,11],[21,22],[32,33],[43,44],[54,55],[59,0]]
-if __name__ == "__main__":
-    while True:
+while True:
+    currentdir = os.path.dirname(os.path.realpath(__file__))
+    sys.path.append(os.path.dirname(os.path.dirname(currentdir)))
+    from LoRaRF import SX127x
+    import time
+    from gpiozero import CPUTemperature
+    busId = 0; csId = 0
+    resetPin = 22; irqPin = -1; txenPin = -1; rxenPin = -1
+    LoRa = SX127x()
+    print("Begin LoRa radio")
+    if not LoRa.begin(busId, csId, resetPin, irqPin, txenPin, rxenPin) :
+        raise Exception("Something wrong, can't begin LoRa radio")
+    print("Set frequency to 433 Mhz")
+    LoRa.setFrequency(433000000)
+    print("Set modulation parameters:\n\tSpreading factor = 7\n\tBandwidth = 125 kHz\n\tCoding rate = 4/5")
+    LoRa.setSpreadingFactor(7)
+    LoRa.setBandwidth(125000)
+    LoRa.setCodeRate(4/5)
+    print("Set packet parameters:\n\tExplicit header type\n\tPreamble length = 12\n\tPayload Length = 15\n\tCRC on")
+    LoRa.setHeaderType(LoRa.HEADER_EXPLICIT)
+    LoRa.setPreambleLength(12)
+    LoRa.setPayloadLength(15)
+    LoRa.setCrcEnable(True)
+    print("Set syncronize word to 0x34")
+    LoRa.setSyncWord(0x34)
+    print("\n-- LoRa Gateway --\n")
+    recv_slot=[[1,10],[11,21],[22,32],[33,43],[44,54],[55,59]]
+    sleep = [[10,11],[21,22],[32,33],[43,44],[54,55],[59,0]]
+    if __name__ == "__main__":
         for i, slot in enumerate(recv_slot):
                 current_min = datetime.now().minute
                 if slot[0] <= current_min < slot[1]:
                     print("-------------Gateway shifts to reciving mode---------------")
                     LoRa.setRxGain(LoRa.RX_GAIN_POWER_SAVING, LoRa.RX_GAIN_AUTO)
                     LoRa.request()
-                    LoRa.wait()
+                    LoRa.wait(2)
                     try:
                         rcv_data=[]
                         while LoRa.available():
@@ -82,10 +77,9 @@ if __name__ == "__main__":
                     status = LoRa.status()
                     if status == LoRa.STATUS_CRC_ERR : print("CRC error")
                     elif status == LoRa.STATUS_HEADER_ERR : print("Packet header error")
-                    time.sleep(1)           
-            
-            
-
-        
-        
-    
+                    time.sleep(2)
+        for i, slot in enumerate(sleep):
+            current_min = datetime.now().minute
+            if slot[0] <= current_min < slot[1]:
+                time.sleep(61)
+                    
