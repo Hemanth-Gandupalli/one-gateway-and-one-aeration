@@ -45,11 +45,11 @@ while True:
                 print("-------------Gateway shifts to sending mode---------------")
                 sensor1 = uniform(2.20, 2.48)
                 sensor2 = uniform(1.08, 1.5)
-                sensor3 = uniform(1.0, 2.0)
-                sensor4 = uniform(1.0, 2.0)
-                x = uniform(1.0, 2.0)
-                y = uniform(1.0, 2.0)
-                z = uniform(1.0, 2.0)
+                sensor3 = uniform(3.30, 3.59)
+                sensor4 = uniform(4.25, 4.66)
+                x = uniform(5.5, 5.9)
+                y = uniform(6.0, 6.4)
+                z = uniform(7.13, 7.48)
                 datalist = [sensor1,sensor2,sensor3,sensor4,x,y,z]
                 struct_data = struct.pack('7f',datalist[0],datalist[1],datalist[2],datalist[3],datalist[4],datalist[5],datalist[6])
                 print("bytes_data ",struct_data)
@@ -61,5 +61,8 @@ while True:
                 LoRa.endPacket()
                 LoRa.wait()
                 print("Transmit time: {0:0.2f} ms | Data rate: {1:0.2f} byte/s".format(LoRa.transmitTime(), LoRa.dataRate()))
-                time.sleep(5)
-
+                time.sleep(3)
+    for i, slot in enumerate(sleep):
+        current_min = datetime.now().minute
+        if slot[0] <= current_min < slot[1]:
+            time.sleep(61)
