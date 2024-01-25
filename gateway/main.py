@@ -17,10 +17,8 @@ GPIO.setup(23, GPIO.OUT, initial=GPIO.HIGH)
 GPIO.setup(5, GPIO.OUT, initial=GPIO.HIGH)
 
 delay_main = 2
-delay_internet_off = 3600
-delay_compressor_off = 1800
-delay_mail = 10
-delay_current = 1800
+delay_device = 600
+last_device_off = time.time()
 
 mq = MqttConnect()
 mq.topic = ["661526019560586","324164884510875"]
@@ -34,11 +32,11 @@ def post_data_to_publish():
     mq.connect_to_broker()
     while True:
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        with open('/home/pi/status.txt','r') as f:
+        with open('status.txt','r') as f:
             status = f.read()
         if status == "True":
             try:
-                with open ("/home/pi/data.json",'r') as f:
+                with open ("data.json",'r') as f:
                     data = json.load(f)
                 sensor1 = data["sensor1"]
                 sensor2 = data["sensor2"]
@@ -85,23 +83,31 @@ def data_subscribe():
         mqtt_client.loop_start()
         
 def main():
+    global last_device_off
     while True:
-        with open("/home/pi/status.txt",'r') as f:
-            status = f.read()
-        if status == "True":
-            GPIO.output(6, GPIO.HIGH)
-            print("Load ON")
-        else:
+        now = time.time()
+        if now - last_device_off >= delay_device:
             print("Load off")
-            GPIO.output(6, GPIO.LOW)
+            GPIO.output(5, GPIO.LOW)
+            time.sleep(300)
+            last_device_off = time.time()
+        else:
+            with open("status.txt",'r') as f:
+                status = f.read()
+            if status == "True":
+                GPIO.output(5, GPIO.HIGH)
+                print("Load ON")
+            elif status == "False":
+                GPIO.output(5, GPIO.LOW)
+                print("Load OFF")
         time.sleep(delay_main)
 
 def internet():
     while True:
-        GPIO.output(5, GPIO.HIGH)
+        GPIO.output(6, GPIO.HIGH)
         print("Internet is ON")
         time.sleep(3600)
-        GPIO.output(5, GPIO.LOW)
+        GPIO.output(6, GPIO.LOW)
         print("Internet is OFF")  
         time.sleep(3)
 
@@ -114,10 +120,10 @@ def compressor():
         print("Compressor is OFF")
         time.sleep(1800)
 def mail():
-    time.sleep(10)
+    time.sleep(15)
     while True:
         try:
-            with open("/home/pi/status.txt",'r') as f:
+            with open("status.txt",'r') as f:
                 status = f.read()
             s = status
             print(s)
@@ -144,7 +150,7 @@ def mail():
                 z = round(data["z"],2)
                 print("t")
                 #body = f"GW_Status:ON  Aeration:On  CompCurrVal:{current1} Amp  AerationCurrVal:{current2} Amp"
-                body = f"GW_Status:ON  Aeration:On\n  sensor1 :{sensor1} Amp\nsensor2 :{sensor2} Amp\nsensor3 :{sensor3} Amp\nsensor4 :{sensor4} Amp\nX :{x} Amp\nY :{y} Amp\nZ :{z} Amp"
+                body = f"GW_Status:ON  Aeration:On  sensor1 :{sensor1} Amp\nsensor2 :{sensor2} Amp\nsensor3 :{sensor3} Amp\nsensor4 :{sensor4} Amp\nX :{x} Amp\nY :{y} Amp\nZ :{z} Amp"
             else:
                 print("f")
                 body = "GW_status:ON Aeration Device :OFF"
