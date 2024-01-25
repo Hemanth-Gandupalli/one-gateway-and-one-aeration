@@ -77,9 +77,9 @@ while True:
                     status = LoRa.status()
                     if status == LoRa.STATUS_CRC_ERR : print("CRC error")
                     elif status == LoRa.STATUS_HEADER_ERR : print("Packet header error")
-                    time.sleep(2)
+                    #time.sleep(2)
         for i, slot in enumerate(sleep):
             current_min = datetime.now().minute
             if slot[0] <= current_min < slot[1]:
                 time.sleep(61)
-                    
+    time.sleep(2)                
