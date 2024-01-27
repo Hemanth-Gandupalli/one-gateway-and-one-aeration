@@ -36,8 +36,8 @@ LoRa.setCrcEnable(True)
 print("Set syncronize word to 0x34")
 LoRa.setSyncWord(0x34)
 print("\n-- LoRa Node1 --\n")
-send_slot=[[1,10],[11,21],[22,32],[33,43],[44,54],[55,59]]
-sleep = [[10,11],[21,22],[32,33],[43,44],[54,55],[59,0]]
+send_slot=[[1,5],[6,11],[12,17],[18,23],[24,29],[30,35],[36,41],[42,47],[48,53],[54,59]]
+sleep = [[5,6],[11,12],[17,18],[23,24],[29,30],[35,36],[41,42],[47,48],[53,54],[59,1]]
 while True:
     for i, slot in enumerate(send_slot):
             current_min = datetime.now().minute
@@ -61,7 +61,7 @@ while True:
                 LoRa.endPacket()
                 LoRa.wait()
                 print("Transmit time: {0:0.2f} ms | Data rate: {1:0.2f} byte/s".format(LoRa.transmitTime(), LoRa.dataRate()))
-                time.sleep(3)
+                time.sleep(5)
     for i, slot in enumerate(sleep):
         current_min = datetime.now().minute
         if slot[0] <= current_min < slot[1]:
