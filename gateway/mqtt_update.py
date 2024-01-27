@@ -1,6 +1,11 @@
 from paho.mqtt.client import Client
 import json
 from datetime import datetime
+from mail2 import mail2
+import time
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 class MqttConnect:
     def __init__(self):
@@ -70,12 +75,63 @@ class MqttConnect:
         print(f"Received message: {data}")
         print(f"status val :---{status}")
         with open("status.txt",'w') as f:
-            f.write(str(status))        
+            f.write(str(status))
+        self.mail2()
+                    
     
     def open_file(self , file_name):
         if file_name.lower().endswith(".json"):
             with open(file_name) as json_file:
                 data = json.load(json_file)
             return data
+        
+    def mail2():
+        time.sleep(20)
+        try:
+            with open("status.txt",'r') as f:
+                status = f.read()
+            s = status
+            print(s)
+            email_user = "care.bariflolabs@gmail.com"
+            email_password = "ifln keco pdbc hqts"
+            # email_send = "data.bariflolabs@gmail.com"
+            email_send = "gandupallihemanth86@gmail.com"
+            #email_send = "g"
+            subject = "IWMS Status"
+
+            msg = MIMEMultipart()
+            msg["From"] = email_user
+            msg["To"] = email_send
+            msg["Subject"] = subject
+            if  s == "True":
+                with open('data.json', 'r') as file:
+                    data = json.load(file)
+                sensor1 = round(data["sensor1"],2)
+                sensor2 = round(data["sensor2"],2)
+                sensor3 = round(data["sensor3"],2) 
+                sensor4 = round(data["sensor4"],2)
+                x = round(data["x"],2)
+                y = round(data["y"],2)
+                z = round(data["z"],2)
+                print("t")
+                #body = f"GW_Status:ON  Aeration:On  CompCurrVal:{current1} Amp  AerationCurrVal:{current2} Amp"
+                body = f"GW_Status:ON  Aeration:On  sensor1 :{sensor1} Amp\nsensor2 :{sensor2} Amp\nsensor3 :{sensor3} Amp\nsensor4 :{sensor4} Amp\nX :{x} Amp\nY :{y} Amp\nZ :{z} Amp"
+            else:
+                print("f")
+                body = "GW_status:ON Aeration Device :OFF"
 
 
+            msg.attach(MIMEText(body,"plain"))
+
+            text = msg.as_string()
+            server = smtplib.SMTP("smtp.gmail.com",587)
+            server.starttls()
+            server.login(email_user,email_password)
+
+
+            server.sendmail(email_user,email_send,text)
+            server.quit()
+        except Exception as e:
+            print(e)
+    
+    
